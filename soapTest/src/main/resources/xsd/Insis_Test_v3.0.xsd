@@ -1,0 +1,279 @@
+<xs:schema targetNamespace="http://www.fadata.bg/Insurance_Messages/v3.0/xml/"  
+           xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           xmlns="http://www.fadata.bg/Insurance_Messages/v3.0/xml/" 
+           elementFormDefault="qualified">
+  <xs:include schemaLocation="Insis_BaseTypes_v3.0.xsd"/>
+  <!-- Service Request messages -->
+  <xs:element name="TestRq">
+    <xs:complexType>
+      <xs:choice>
+        <xs:any maxOccurs="unbounded" minOccurs="0" processContents="lax"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <!-- Service Response messages -->
+  <xs:element name="TestRs">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:group name="Test_Rq_Group">
+    <xs:choice>
+      <xs:element name="TestRq">
+        <xs:complexType>
+          <xs:choice>
+            <xs:any maxOccurs="unbounded" minOccurs="0" processContents="lax"/>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="Test_Rs_Group">
+    <xs:choice>
+      <xs:element name="TestRs">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:choice>
+  </xs:group>
+  <xs:complexType name="ConcatStringRq_Type">
+    <xs:sequence>
+      <xs:element ref="PID"/>
+      <xs:element name="OfficeCode" type="xs:string"/>
+      <xs:element ref="ProductCode"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ConcatStringRs_Type">
+    <xs:sequence>
+      <xs:element name="Level1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Level2">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element ref="ReturningMessage" maxOccurs="unbounded"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SplitStringRq_Type">
+    <xs:sequence>
+      <xs:element name="Input" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SplitStringRs_Type">
+    <xs:sequence>
+      <xs:element name="Rows">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" name="Row">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="Column" maxOccurs="unbounded"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ACTestRegisterAddEquipRq_Type">
+    <xs:sequence>
+      <xs:element ref="OAdditionalEquipment"/>
+      <xs:group ref="Insured_Group"/>
+      <xs:element ref="Owners"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ACTestRegisterAddEquipRs_Type">
+    <xs:sequence>
+      <xs:element ref="InsuredObjectID" minOccurs="0"/>
+      <xs:element ref="ObjectID"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="QueryPolicyRq_Type">
+    <xs:sequence>
+      <xs:element name="PolicyNo" type="xs:string"/>
+      <xs:element name="PolicyIdRq" type="xs:integer"/>
+      <xs:element name="AnnexIdRq" type="xs:integer"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="QueryPolicyRs_Type">
+    <xs:sequence>
+      <xs:element name="PolicyID" type="xs:string" maxOccurs="1" minOccurs="1"/>
+      <xs:element ref="ProductCode"/>
+      <xs:element name="PolicyName"/>
+      <xs:element name="PolicyNo" minOccurs="0" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="UpdatePolicyRq_Type">
+    <xs:sequence>
+      <xs:element name="PolicyNo" type="xs:string"/>
+      <xs:element name="PolicyName" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="UpdatePolicyRs_Type">
+    <xs:sequence>
+      <xs:element name="PolicyID" type="xs:string" maxOccurs="1" minOccurs="1"/>
+      <xs:element ref="ProductCode"/>
+      <xs:element name="PolicyName"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="JavaActionRs_Type">
+    <xs:sequence>
+      <xs:element name="Result" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="JavaActionRq_Type">
+    <xs:sequence>
+      <xs:element name="CustomProperties" type="CustomProperties_Type"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SQLFunctionRs_Type">
+    <xs:sequence>
+      <xs:element name="Result" type="xs:integer"/>
+      <xs:element name="InsuredObjectID" type="xs:integer"/>
+      <xs:element name="ObjectType" type="xs:integer"/>
+      <xs:element name="InsuredValue" type="xs:integer"/>
+      <xs:element name="ObjectID" type="xs:integer"/>
+      <xs:element name="ErrorMessage" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SQLFunctionRq_Type">
+    <xs:sequence>
+      <xs:element name="ObjectID" type="xs:integer" minOccurs="0"/>
+      <xs:element name="InsuredAmount" type="xs:integer" maxOccurs="1"
+                  minOccurs="0"/>
+      <xs:element name="Currency" type="xs:string"/>
+      <xs:element name="ObjectNum" type="xs:integer"/>
+      <xs:element name="ParentObjectID" type="xs:string"/>
+      <xs:element name="EquipmentType" type="xs:string"/>
+      <xs:element name="Model" type="xs:string"/>
+      <xs:element name="SerialNo" type="xs:string"/>
+      <xs:element name="IVOver" type="xs:string" minOccurs="0"/>
+      <xs:element name="Avpath" type="xs:integer" minOccurs="0"/>
+      <xs:element name="AECurrency" type="xs:string" minOccurs="0"/>
+      <xs:element name="EquipmentKind" type="xs:string"/>
+      <xs:element name="stringCustomProperties" type="xs:string" minOccurs="0"/>
+      <xs:element name="PolicyID" type="xs:integer"/>
+      <xs:element name="Payway" type="xs:integer" minOccurs="0"/>
+      <xs:element name="AnnexID" type="xs:integer" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SwitchTestRq_Type">
+    <xs:sequence>
+      <xs:element name="SwitchTo" type="xs:string"/>
+      <xs:element name="Input" type="xs:string"/>
+      <xs:element ref="PID"/>
+      <xs:element name="OfficeCode" type="xs:string"/>
+      <xs:element ref="ProductCode"/>
+      <xs:element name="Others" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:any processContents="lax" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ChainTestRs_Type">
+    <xs:sequence>
+      <xs:element name="QueryPolicyRs" type="QueryPolicyRs_Type" maxOccurs="1" minOccurs="1"/>
+      <xs:element name="JavaActionRs" type="JavaActionRs_Type" maxOccurs="1" minOccurs="1"/>
+      <xs:element name="QueryPolicy2Rs" type="QueryPolicyRs_Type"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ChainTestRq_Type">
+    <xs:sequence>
+      <xs:element name="PolicyNo" type="xs:string"/>
+      <xs:element name="PolicyName" type="xs:string"/>
+      <xs:element name="CustomProperties" type="CustomProperties_Type"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="RegisterAnnexRq_Type">
+    <xs:sequence>
+      <xs:group ref="Insured_Group"/>
+      <xs:element ref="ObjectID" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="Annex" type="Annex_Type"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="RegisterAnnexRs_Type">
+    <xs:sequence>
+      <xs:element minOccurs="1" name="PolicyID" type="xs:integer"/>
+      <xs:element ref="AnnexID"/>
+      <xs:element name="PostInsertResult" type="xs:integer"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="OwnersTestRq_Type">
+    <xs:sequence>
+      <xs:element name="ObjectID" type="xs:integer"/>
+      <xs:element ref="Owners" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="OwnersTestRs_Type">
+    <xs:sequence>
+      <xs:any minOccurs="0" processContents="strict"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="RegisterObjectRq_Type">
+    <xs:sequence>
+      <xs:group ref="Insured_Group"/>
+      <xs:element ref="Owners"/>
+      <xs:choice>
+        <xs:element ref="OAdditionalEquipment" minOccurs="0"/>
+        <xs:element ref="OAnimal" minOccurs="0"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="RegisterObjectRs_Type">
+    <xs:sequence>
+      <xs:element ref="InsuredObjectID" minOccurs="0"/>
+      <xs:element ref="ObjectID"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="MyTestRq_Type">
+    <xs:sequence>
+      <xs:element name="InsuredObjectID" type="xs:date" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="MyTestRs_Type">
+    <xs:sequence>
+      <xs:element name="ReturningMessage" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="WSForwardRq_Type">
+    <xs:sequence>
+      <xs:element name="Questionnairy">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Answer" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:simpleContent>
+                  <xs:extension base="xs:string">
+                    <xs:attribute name="id" use="required"/>
+                  </xs:extension>
+                </xs:simpleContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="id"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="WSForwardRs_Type">
+    <xs:sequence>
+      <xs:any minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

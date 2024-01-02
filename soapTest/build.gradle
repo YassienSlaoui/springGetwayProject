@@ -1,0 +1,117 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '2.6.0'
+	id 'io.spring.dependency-management' version '1.1.3'
+}
+
+group = 'com.dreamTeam'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '11'
+}
+
+sourceSets {
+	main {
+		java {
+			srcDir 'src/main/java'
+			srcDir 'build/generated-sources/jaxb'
+		}
+	}
+}
+
+repositories {
+	mavenCentral()
+	maven { url 'https://repo.spring.io/snapshot' }
+	maven { url 'https://repo.spring.io/milestone' }
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+	jaxb
+}
+
+task genJaxb {
+	ext.sourcesDir = "${projectDir}/src/main/java/generated-sources/jaxb"
+	ext.classesDir = "${projectDir}/src/main/java/classes/jaxb"
+	outputs.dir classesDir
+
+	doLast {
+		project.ant {
+			// Create output directories
+			mkdir(dir: sourcesDir)
+			mkdir(dir: classesDir)
+
+			taskdef(name: 'xjc', classname: 'com.sun.tools.xjc.XJCTask', classpath: configurations.jaxb.asPath)
+			println "Found WSDL file: ${projectDir}"
+			// Generating JAXB classes from XSD files
+			ant.fileset(dir: 'src/main/resources', includes: '**/*.xsd', id: 'xsdFiles')
+			def xsdFiles = ant.project.references.xsdFiles
+			//def xsdFiles = fileTree(dir: "${projectDir}/src/main/resources/xsd", include: '**/*.xsd')
+			ant.fileset(dir: 'src/main/resources', includes: '**/*.wsdl', id: 'wsdlFiles')
+			def wsdlFiles = ant.project.references.wsdlFiles
+			xsdFiles.each { xsdFile ->
+				println "Found WSDL file: ${xsdFile}"
+				xjc(destdir: sourcesDir) {
+					schema(file: xsdFile)
+					arg(value: "-extension")
+					produces(dir: sourcesDir, includes: '**/*.java')
+				}
+			}
+			// Process WSDL files
+			wsdlFiles.each { wsdlFile ->
+				println "Found WSDL file: ${wsdlFile}"
+				xjc(destdir: sourcesDir) {
+					wsdl(file: wsdlFile)
+					arg(value: "-extension")
+					produces(dir: sourcesDir, includes: '**/*.java')
+				}
+			}
+			javac(destdir: classesDir, source: 11, target: 11, debug: true,
+					debugLevel: 'lines,vars,source',
+					includeantruntime: false,
+					classpath: configurations.jaxb.asPath) {
+				src(path: sourcesDir)
+				include(name: '**/*.java')
+			}
+
+			copy(todir: classesDir) {
+				fileset(dir: sourcesDir, erroronmissingdir: false) {
+					exclude(name: '**/*.java')
+				}
+			}
+		}
+	}
+}
+
+bootJar {
+	from genJaxb.classesDir
+}
+
+dependencies {
+	implementation "org.springframework.boot:spring-boot-starter-web-services"
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	implementation(files(genJaxb.classesDir).builtBy(genJaxb))
+
+	jaxb 'com.sun.xml.bind:jaxb-xjc:2.1.7'
+	jaxb "com.migesok:jaxb-java-time-adapters:1.1.3"
+}
+
+compileJava.dependsOn 'genJaxb'
+
+jar {
+	from genJaxb.classesDir
+}
+task printWsdlFiles {
+	doLast {
+		println "Found WSDL file: ${projectDir}"
+		def wsdlFiles = fileTree(dir: "${projectDir}/src/main/resources/xsd", include: '**/*.xsd')
+		wsdlFiles.each { wsdlFile ->
+			println "Found WSDL file: ${wsdlFile}"
+		}
+	}
+}
